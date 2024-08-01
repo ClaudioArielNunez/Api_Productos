@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Productos.Server.Models;
+using System.ComponentModel;
 
 namespace Productos.Server.Controllers
 {
@@ -19,6 +20,15 @@ namespace Productos.Server.Controllers
         [Route("crear")]
         public async Task<IActionResult> CrearProducto(Producto producto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Message = "Los datos del producto no son válidos", //ModelState.Values: Accede a todos los valores del estado del modelo,
+                    Errors = ModelState.Values.SelectMany(x => x.Errors) //SelectMany combina todos esos errores en una única colección.
+                                                                         //Así, Errors es una lista de todos los errores de validación que se han producido.
+                });
+            }
             await _context.Productos.AddAsync(producto);
             await _context.SaveChangesAsync();
             //creando un objeto anonimo para devolver un mensaje rapido
@@ -29,6 +39,7 @@ namespace Productos.Server.Controllers
             };
 
             return Ok(response);
+            
         }
 
         [HttpGet]
@@ -44,7 +55,7 @@ namespace Productos.Server.Controllers
         }
 
         [HttpGet]
-        [Route("ver")]
+        [Route("ver/{id}")]
         public async Task<IActionResult> ListarPorId(int? id)
         {
 
@@ -78,7 +89,7 @@ namespace Productos.Server.Controllers
         }
 
         [HttpPut]
-        [Route("editar")]
+        [Route("editar/{id}")]
         public async Task<IActionResult> ActualizarProducto(int? id, Producto producto)
         {
             if (id != null)
@@ -122,7 +133,7 @@ namespace Productos.Server.Controllers
 
 
         [HttpDelete]
-        [Route("eliminar")]
+        [Route("eliminar/{id}")]
         public async Task<IActionResult> EliminarProducto(int? id)
         {
             if (id != null)
