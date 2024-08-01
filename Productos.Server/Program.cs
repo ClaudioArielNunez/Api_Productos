@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using Productos.Server.Models;
+
 namespace Productos.Server
 {
     public class Program
@@ -6,10 +9,13 @@ namespace Productos.Server
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var conexion = builder.Configuration.GetConnectionString("DefaultConnection");
 
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddDbContext<ProductosContext>(options => options.UseSqlServer(conexion));
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
