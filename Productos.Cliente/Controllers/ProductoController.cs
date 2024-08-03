@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Productos.Cliente.Models;
+using Productos.Server.Models;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace Productos.Cliente.Controllers
@@ -25,7 +27,7 @@ namespace Productos.Cliente.Controllers
         {
             var response = await _httpClient.GetAsync("api/Productos/lista");
 
-            if (response.IsSuccessStatusCode) //si da 200
+            if (response.IsSuccessStatusCode) //si da 200-299
             {
                 //leemos contenido de response
                 var content = await response.Content.ReadAsStringAsync();
@@ -38,5 +40,33 @@ namespace Productos.Cliente.Controllers
             return View(new List<ProductoViewModel>()); //devuelve una lista vacia
         }
 
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Producto producto)
+        {
+            if (ModelState.IsValid)
+            {
+                var json = JsonConvert.SerializeObject(producto);
+
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("api/Productos/crear", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Error al crear producto");
+                }
+            }
+
+            return View(producto);
+        }
     }
 }
