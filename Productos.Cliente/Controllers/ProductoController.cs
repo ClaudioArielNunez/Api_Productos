@@ -40,6 +40,7 @@ namespace Productos.Cliente.Controllers
             return View(new List<ProductoViewModel>()); //devuelve una lista vacia
         }
 
+        //Metodo Get
         public IActionResult Create()
         {
             return View();
@@ -50,10 +51,17 @@ namespace Productos.Cliente.Controllers
         {
             if (ModelState.IsValid)
             {
+                //Convierte el objeto producto a una cadena JSON
                 var json = JsonConvert.SerializeObject(producto);
-
+                /*
+                 StringContent: Es una clase en C# que se utiliza para representar el contenido de una solicitud HTTP en formato de texto.
+                 json es el contenido que quieres enviar en el cuerpo de la solicitud HTTP.
+                 Encoding.UTF8: Especifica el tipo de codificación para convertir la cadena json en bytes.
+                 Tipo de contenido: Se indica que el contenido es de tipo application/json, lo cual es crucial para que el servidor entienda que estás enviando datos en formato JSON.
+                 */
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+                //Usa _httpClient para enviar una solicitud HTTP POST al endpoint api/Productos/crear
                 var response = await _httpClient.PostAsync("api/Productos/crear", content);
 
                 if (response.IsSuccessStatusCode)
@@ -62,6 +70,7 @@ namespace Productos.Cliente.Controllers
                 }
                 else
                 {
+                    //agrega un mensaje de error al ModelState.
                     ModelState.AddModelError(string.Empty, "Error al crear producto");
                 }
             }

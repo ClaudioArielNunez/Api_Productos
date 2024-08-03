@@ -15,7 +15,7 @@ namespace Productos.Server.Models
         public string Descripcion { get; set; } = string.Empty;
 
         [Column(TypeName ="decimal(18,2)")]
-        [DisplayFormat(DataFormatString ="{0:C2}")] //Formato moneda
+        [DisplayFormat(DataFormatString ="{0:C2}")] //Formato moneda        
         public decimal Precio { get; set; }
     }
 }
