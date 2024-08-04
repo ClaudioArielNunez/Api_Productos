@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Productos.Server.Models;
-using System.ComponentModel;
 
 namespace Productos.Server.Controllers
 {
@@ -39,7 +38,7 @@ namespace Productos.Server.Controllers
             };
 
             return Ok(response);
-            
+
         }
 
         [HttpGet]

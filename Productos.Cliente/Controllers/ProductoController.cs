@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Productos.Cliente.Models;
+using Productos.Server.Migrations;
 using Productos.Server.Models;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace Productos.Cliente.Controllers
 {
@@ -18,7 +18,7 @@ namespace Productos.Cliente.Controllers
         //BaseAddress configura la dirección base que se usará para todas las solicitudes
         //realizadas con este HttpClient
         public ProductoController(IHttpClientFactory httpClientFactory)
-        {            
+        {
             _httpClient = httpClientFactory.CreateClient();
             _httpClient.BaseAddress = new Uri("https://localhost:7277/api");
         }
@@ -29,6 +29,7 @@ namespace Productos.Cliente.Controllers
 
             if (response.IsSuccessStatusCode) //si da 200-299
             {
+
                 //leemos contenido de response
                 var content = await response.Content.ReadAsStringAsync();
                 //Deserializamos, instalando Newtonsoft.Json;
@@ -58,6 +59,7 @@ namespace Productos.Cliente.Controllers
                  json es el contenido que quieres enviar en el cuerpo de la solicitud HTTP.
                  Encoding.UTF8: Especifica el tipo de codificación para convertir la cadena json en bytes.
                  Tipo de contenido: Se indica que el contenido es de tipo application/json, lo cual es crucial para que el servidor entienda que estás enviando datos en formato JSON.
+                 Sin la creación de StringContent, no podrías enviar el JSON correctamente en la solicitud POST. 
                  */
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -75,6 +77,48 @@ namespace Productos.Cliente.Controllers
                 }
             }
 
+            return View(producto);
+        }
+
+        //httpGet
+        public async Task<IActionResult> Edit(int id)
+        {
+            var response = await _httpClient.GetAsync($"api/Productos/ver/{id}"); //api/Productos/ver/3
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+
+                var producto = JsonConvert.DeserializeObject<ProductoViewModel>(json);
+
+                return View(producto);
+            }
+            else
+            {
+                return RedirectToAction("Details"); 
+            }            
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, ProductoViewModel producto)//api/Productos/editar/3     
+        {                                                                                 
+            if (ModelState.IsValid)
+            {
+                var json = JsonConvert.SerializeObject(producto);
+
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync($"api/Productos/editar/{id}", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Error al actualizar producto");
+                }
+            }
             return View(producto);
         }
     }

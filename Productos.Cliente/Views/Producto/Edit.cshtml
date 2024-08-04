@@ -1,0 +1,43 @@
+﻿@model Productos.Cliente.Models.ProductoViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Editar</h1>
+<hr />
+
+<div class="card text-primary">
+    <div class="card-header text-center">
+        <h5>Editar producto</h5>
+    </div>
+    <div class="card-body ">
+        <div class="col-md-12">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="mb-3">
+                    @* <label asp-for="Nombre" class="form-label"></label> *@
+                    <input asp-for="Nombre" class="form-control" placeholder="Nombre" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    @* <label asp-for="Descripcion" class="form-label"></label> *@
+                    <input asp-for="Descripcion" class="form-control" placeholder="Descripcion" />
+                    <span asp-validation-for="Descripcion" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    @* <label asp-for="Precio" class="form-label"></label> *@
+                    <input asp-for="Precio" class="form-control" placeholder="Precio" />
+                    <span asp-validation-for="Precio" class="text-danger"></span>
+                </div>
+                <div class="card-footer text-center">
+                    <div class="mb-3">
+                        <input type="submit" value="Editar" class="btn btn-outline-warning" />
+                        <a asp-action="Index" class="btn btn-outline-success">Volver</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
