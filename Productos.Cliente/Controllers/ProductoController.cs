@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Newtonsoft.Json;
 using Productos.Cliente.Models;
 using Productos.Server.Migrations;
@@ -120,6 +121,42 @@ namespace Productos.Cliente.Controllers
                 }
             }
             return View(producto);
+        }
+
+        //HttpGet
+        public async Task<IActionResult> Details(int id)
+        {
+            var response = await _httpClient.GetAsync($"api/Productos/ver/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+
+                var producto = JsonConvert.DeserializeObject<ProductoViewModel>(json);
+
+                return View(producto);
+            }
+            else
+            {
+                return RedirectToAction("Details");
+            }
+        }
+
+        //HttpGet
+        public async Task<IActionResult> Delete(int id) //api/Productos/eliminar/{id}
+        {
+            var response = await _httpClient.DeleteAsync($"api/Productos/eliminar/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["Error"] = "Error al eliminar producto";
+
+                return RedirectToAction("Index");
+            }
         }
     }
 }
