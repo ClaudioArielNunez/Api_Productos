@@ -145,15 +145,25 @@ namespace Productos.Cliente.Controllers
         //HttpGet
         public async Task<IActionResult> Delete(int id) //api/Productos/eliminar/{id}
         {
-            var response = await _httpClient.DeleteAsync($"api/Productos/eliminar/{id}");
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/Productos/eliminar/{id}");
 
-            if (response.IsSuccessStatusCode)
-            {
-                return RedirectToAction("Index");
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["successMessage"] = "El producto ha sido eliminado con exito!";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    TempData["errorMessage"] = "No se ha podido eliminar el producto";
+
+                    return RedirectToAction("Index");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TempData["Error"] = "Error al eliminar producto";
+                TempData["errorMessage"] = ex.Message;
 
                 return RedirectToAction("Index");
             }
