@@ -49,10 +49,17 @@ namespace Productos.Cliente.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Producto producto)
+        public async Task<IActionResult> Create(ProductoViewModel model)
         {
             if (ModelState.IsValid)
             {
+                // Convertir ProductoViewModel a Producto
+                var producto = new Producto()
+                {
+                    Nombre = model.Nombre,
+                    Descripcion = model.Descripcion,
+                    Precio = model.Precio,
+                };
                 //Convierte el objeto producto a una cadena JSON
                 var json = JsonConvert.SerializeObject(producto);
                 /*
@@ -78,7 +85,7 @@ namespace Productos.Cliente.Controllers
                 }
             }
 
-            return View(producto);
+            return View(model);
         }
 
         //httpGet
@@ -88,11 +95,20 @@ namespace Productos.Cliente.Controllers
 
             if (response.IsSuccessStatusCode)
             {
+
                 var json = await response.Content.ReadAsStringAsync();
 
-                var producto = JsonConvert.DeserializeObject<ProductoViewModel>(json);
+                var producto = JsonConvert.DeserializeObject<Producto>(json);
 
-                return View(producto);
+                // Convertir Producto a ProductoViewModel
+                ProductoViewModel model = new ProductoViewModel()
+                {
+                    Nombre = producto.Nombre,
+                    Descripcion = producto.Descripcion,
+                    Precio = producto.Precio,
+                };
+
+                return View(model);
             }
             else
             {
@@ -101,11 +117,26 @@ namespace Productos.Cliente.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, ProductoViewModel producto)//api/Productos/editar/3     
+        public async Task<IActionResult> Edit(int id, ProductoViewModel model)//api/Productos/editar/3     
         {                                                                                 
             if (ModelState.IsValid)
             {
-                var json = JsonConvert.SerializeObject(producto);
+                // Verificar si el id en la URL coincide con el id en el ViewModel
+                if (id != model.Id)
+                {
+                    ModelState.AddModelError(string.Empty, "El id del producto no coincide.");
+                    return View(model);
+                }
+
+                // Actualizar los campos del producto con los datos del ViewModel
+                var productoExistente = new Producto()
+                {
+                    Nombre = model.Nombre,
+                    Descripcion = model.Descripcion,
+                    Precio = model.Precio,
+                };              
+           
+                var json = JsonConvert.SerializeObject(productoExistente);
 
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -120,7 +151,7 @@ namespace Productos.Cliente.Controllers
                     ModelState.AddModelError(string.Empty, "Error al actualizar producto");
                 }
             }
-            return View(producto);
+            return View(model);
         }
 
         //HttpGet
@@ -132,9 +163,16 @@ namespace Productos.Cliente.Controllers
             {
                 var json = await response.Content.ReadAsStringAsync();
 
-                var producto = JsonConvert.DeserializeObject<ProductoViewModel>(json);
+                var producto = JsonConvert.DeserializeObject<Producto>(json);
 
-                return View(producto);
+                ProductoViewModel model = new ProductoViewModel()
+                {
+                    Nombre = producto.Nombre,
+                    Descripcion = producto.Descripcion,
+                    Precio = producto.Precio,
+                };
+
+                return View(model);
             }
             else
             {
